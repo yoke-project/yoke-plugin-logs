@@ -270,6 +270,8 @@ struct Shown {
     /// A page of the newest is awaited: frames wait for it.
     waiting: Option<Vec<Entry>>,
     following: bool,
+    // The newest entry is to be shown at the next redraw.
+    to_end: bool,
     oldest: Option<String>,
     older_left: bool,
     dirty: bool,
@@ -284,6 +286,7 @@ async fn own(at: Arc<Attachment>, unit: String, ui: Weak<MainWindow>, tx: mpsc::
         seen: 0,
         waiting: None,
         following: false,
+        to_end: false,
         oldest: None,
         older_left: false,
         dirty: false,
@@ -311,6 +314,7 @@ async fn own(at: Arc<Attachment>, unit: String, ui: Weak<MainWindow>, tx: mpsc::
                                     if s.filter.matches(&e) {
                                         s.rows.push_back(e);
                                         s.dirty = true;
+                                        s.to_end = true;
                                     }
                                 }
                             }
@@ -378,6 +382,7 @@ async fn own(at: Arc<Attachment>, unit: String, ui: Weak<MainWindow>, tx: mpsc::
                                     }
                                 }
                             }
+                            s.to_end = s.following;
                             say(&ui, "Ready");
                         }
                         s.oldest = s.rows.front().and_then(|e| text(e, "__CURSOR"));
@@ -398,10 +403,14 @@ async fn own(at: Arc<Attachment>, unit: String, ui: Weak<MainWindow>, tx: mpsc::
                 let rows: Vec<EntryRow> = s.rows.iter().map(row).collect();
                 let counted = format!("{} entries{}", rows.len(), if s.following { ", following" } else { "" });
                 let older_left = s.older_left;
+                let to_end = std::mem::take(&mut s.to_end);
                 let _ = ui.upgrade_in_event_loop(move |u| {
                     u.set_entries(ModelRc::new(VecModel::from(rows)));
                     u.set_counted(counted.into());
                     u.set_older_left(older_left);
+                    if to_end {
+                        u.invoke_to_end();
+                    }
                 });
             }
         }
