@@ -1,0 +1,9 @@
+plugin: 1
+id: com.yoke.logs
+language: rust
+program: logs
+manifest: plugin/com.yoke.logs.yaml
+build:
+  in: plugin/
+  run: cargo build --release --target "$YOKE_RUST_TARGET" && cp "target/$YOKE_RUST_TARGET/release/logs" "$YOKE_OUT/logs"
+architectures: [x86_64, aarch64]

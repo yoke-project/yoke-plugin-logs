@@ -1,0 +1,27 @@
+[package]
+name = "logs"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+name = "logs"
+path = "src/lib.rs"
+
+[[bin]]
+name = "logs"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time", "signal", "process", "io-util"] }
+async-trait = "0.1"
+# The journal's fields are carried in the order the journal writes them.
+serde_json = { version = "1", features = ["preserve_order"] }
+serde = { version = "1", features = ["derive"] }
+yoke-sdk = "=0.8.0"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["test-util", "macros", "rt-multi-thread"] }
+
+# A Plugin is a program of its own, never a member of a workspace around it.
+[workspace]

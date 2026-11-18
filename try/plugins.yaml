@@ -1,0 +1,8 @@
+plugins:
+  - id: com.yoke.logs
+    unit: logs
+    source: ..
+    tag: null
+    arch: x86_64
+    digest: sha256:a69801c0182d8e1652abcbf4fc21b05cade22d7a3f5118c779089f14cc8b1647
+    taken: 2026-11-17T22:14:25Z

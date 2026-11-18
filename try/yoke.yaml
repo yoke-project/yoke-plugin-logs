@@ -1,0 +1,15 @@
+model: 1
+id: com.yoke.logs-try
+version: 0.1.0
+arch: x86_64
+core: ">=0.15.0"
+units:
+  logs:
+    kind: plugin
+    plugin: com.yoke.logs
+    exec: components/plugins/logs
+    digest: sha256:eb691ff582332efdf9a8863ec14fe01c3c01d61691534fadcc595ebb2ca7cd76
+channels:
+  panel:
+    transport: local
+    clients: single

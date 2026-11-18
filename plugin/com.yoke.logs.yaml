@@ -1,0 +1,35 @@
+manifest: 1
+id: com.yoke.logs
+protocol: 1
+streams:
+  - id: logs.follow
+queries:
+  - id: logs.entries
+  - id: logs.units
+  - id: logs.boots
+  - id: logs.status
+  - id: logs.permissions
+occurrences:
+  - id: logs.entry.critical
+capabilities:
+  - name: query.logs.entries.answer
+    governs:
+      query: logs.entries
+  - name: query.logs.units.answer
+    governs:
+      query: logs.units
+  - name: query.logs.boots.answer
+    governs:
+      query: logs.boots
+  - name: query.logs.status.answer
+    governs:
+      query: logs.status
+  - name: query.logs.permissions.answer
+    governs:
+      query: logs.permissions
+  - name: stream.logs.follow.publish
+    governs:
+      stream: logs.follow
+  - name: event.logs.entry.critical.report
+    governs:
+      occurrence: logs.entry.critical

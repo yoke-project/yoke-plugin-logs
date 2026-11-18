@@ -1,0 +1,98 @@
+import { Button, CheckBox, ComboBox, ListView, Palette } from "std-widgets.slint";
+
+export struct EntryRow {
+    time:     string,
+    // 0 (emerg) to 7 (debug); -1 where the entry names none.
+    priority: int,
+    level:    string,
+    source:   string,
+    message:  string,
+}
+
+component Info inherits Text {
+    color: Palette.foreground.transparentize(0.45);
+    font-size: 12px;
+    vertical-alignment: center;
+}
+
+export component MainWindow inherits Window {
+    title: "Logs";
+    preferred-width: 980px;
+    preferred-height: 620px;
+
+    in property <string> attached_to;
+    in-out property <string> message: "Starting...";
+
+    in property <[string]> units: ["all units"];
+    in property <[string]> priorities: ["any priority"];
+    in property <[EntryRow]> entries;
+    in property <string> counted;
+    in property <bool> older_left;
+    in-out property <bool> following: true;
+
+    callback filter_changed(string, string);
+    callback follow_toggled(bool);
+    callback load_older();
+
+    VerticalLayout {
+        padding: 10px;
+        spacing: 8px;
+
+        HorizontalLayout {
+            spacing: 10px;
+            Text { text: root.message; font-weight: 700; vertical-alignment: center; wrap: word-wrap; horizontal-stretch: 1; }
+            Info { text: root.attached_to; }
+        }
+
+        HorizontalLayout {
+            spacing: 8px;
+            unit := ComboBox {
+                model: root.units;
+                width: 320px;
+                selected(u) => { root.filter_changed(u, priority.current-value); }
+            }
+            priority := ComboBox {
+                model: root.priorities;
+                width: 160px;
+                selected(p) => { root.filter_changed(unit.current-value, p); }
+            }
+            CheckBox {
+                text: "Follow";
+                checked <=> root.following;
+                toggled => { root.follow_toggled(self.checked); }
+            }
+            Rectangle { horizontal-stretch: 1; }
+            Info { text: root.counted; }
+            Button {
+                text: "Older";
+                enabled: root.older_left;
+                clicked => { root.load_older(); }
+            }
+        }
+
+        ListView {
+            vertical-stretch: 1;
+            for e in root.entries : Rectangle {
+                height: 20px;
+                background: e.priority >= 0 && e.priority <= 2 ? #d33.transparentize(0.8)
+                    : e.priority == 3 ? #d33.transparentize(0.9)
+                    : e.priority == 4 ? #e8a020.transparentize(0.88)
+                    : transparent;
+                HorizontalLayout {
+                    padding-left: 6px; padding-right: 6px; spacing: 10px;
+                    Text { text: e.time; width: 150px; font-family: "monospace"; font-size: 12px; vertical-alignment: center; }
+                    Text {
+                        text: e.level;
+                        width: 60px;
+                        font-family: "monospace";
+                        font-size: 12px;
+                        vertical-alignment: center;
+                        color: e.priority >= 0 && e.priority <= 3 ? #d33 : e.priority == 4 ? #c07a00 : Palette.foreground;
+                    }
+                    Text { text: e.source; width: 220px; font-size: 12px; overflow: elide; vertical-alignment: center; }
+                    Text { text: e.message; font-size: 12px; overflow: elide; horizontal-stretch: 1; vertical-alignment: center; }
+                }
+            }
+        }
+    }
+}
