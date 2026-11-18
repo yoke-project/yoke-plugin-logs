@@ -33,6 +33,10 @@ export component MainWindow inherits Window {
     callback filter_changed(string, string);
     callback follow_toggled(bool);
     callback load_older();
+    // Shows the newest entry: called while following, after new entries arrive.
+    public function to_end() {
+        list.viewport-y = min(0px, list.visible-height - list.viewport-height);
+    }
 
     VerticalLayout {
         padding: 10px;
@@ -70,7 +74,7 @@ export component MainWindow inherits Window {
             }
         }
 
-        ListView {
+        list := ListView {
             vertical-stretch: 1;
             for e in root.entries : Rectangle {
                 height: 20px;
